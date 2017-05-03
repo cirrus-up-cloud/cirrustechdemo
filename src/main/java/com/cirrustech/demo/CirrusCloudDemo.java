@@ -23,6 +23,7 @@ public class CirrusCloudDemo {
     public static void main(String[] args) {
 
         LOG.info("Starting application... ");
+        LOG.info("Active Spring profile: " + System.getProperty("spring.profiles.active"));
         SpringApplication.run(CirrusCloudDemo.class, args);
     }
 
