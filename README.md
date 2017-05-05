@@ -8,4 +8,4 @@
 ### How do I get set up? ###
 
 * Compile with maven -> mvn package
-* Run the jar -> java -jar target/demo-java-service-1.0-SAMPLE.jar
+* Run the jar -> java -Dspring.profiles.active=dev -jar target/demo-java-service-1.0-SAMPLE.jar
