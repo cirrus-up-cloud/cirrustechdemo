@@ -1,10 +1,12 @@
 package com.cirrustech.demo;
 
+import com.cirrustech.demo.customize.TomcatServletContainerCustomizer;
 import com.google.common.base.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -34,6 +36,12 @@ public class CirrusCloudDemo {
                 .select().apis(RequestHandlerSelectors.any())
                 .paths(getPaths()).build()
                 .useDefaultResponseMessages(false);
+    }
+
+    @Bean
+    public EmbeddedServletContainerCustomizer embeddedServletCustomizer() {
+
+        return new TomcatServletContainerCustomizer();
     }
 
     public Predicate<String> getPaths() {
