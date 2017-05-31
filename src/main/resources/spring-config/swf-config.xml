@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="provider" class="com.amazonaws.auth.SystemPropertiesCredentialsProvider"/>
+
+    <bean id="credentials" class="com.amazonaws.auth.AWSCredentials" factory-bean="provider"
+          factory-method="getCredentials"/>
+
+
+    <bean id="swfClient" class="com.amazonaws.services.simpleworkflow.AmazonSimpleWorkflowClient">
+        <constructor-arg name="awsCredentials" ref="credentials"/>
+        <property name="endpoint" value="${aws.swf.endpoint}"/>
+    </bean>
+
+    <bean id="activitiesImpl" class="com.cirrustech.demo.service.workflow.swf.ComputerActivitiesImpl"/>
+
+    <bean id="activityWorker" class="com.amazonaws.services.simpleworkflow.flow.spring.SpringActivityWorker">
+        <constructor-arg ref="swfClient"/>
+        <constructor-arg value="${aws.swf.domain}"/>
+        <constructor-arg value="${aws.swf.taskList}"/>
+        <property name="registerDomain" value="true"/>
+        <property name="domainRetentionPeriodInDays" value="1"/>
+        <property name="activitiesImplementations">
+            <list>
+                <ref bean="activitiesImpl"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="workflowImpl" class="com.cirrustech.demo.service.workflow.swf.ComputerWorkflowImpl">
+
+        <constructor-arg name="contextProvider">
+            <bean class="com.amazonaws.services.simpleworkflow.flow.DecisionContextProviderImpl"/>
+        </constructor-arg>
+
+        <constructor-arg name="selfClient">
+            <bean class="com.cirrustech.demo.service.workflow.swf.ComputerWorkflowSelfClientImpl"/>
+        </constructor-arg>
+
+        <constructor-arg name="operations">
+            <bean class="com.cirrustech.demo.service.workflow.swf.ComputerActivitiesClientImpl"/>
+        </constructor-arg>
+
+        <property name="waitTime" value="${workflows.wait.time.seconds}"/>
+    </bean>
+
+    <bean id="workflowWorker"
+          class="com.amazonaws.services.simpleworkflow.flow.spring.SpringWorkflowWorker">
+        <constructor-arg ref="swfClient"/>
+        <constructor-arg value="${aws.swf.domain}"/>
+        <constructor-arg value="${aws.swf.taskList}"/>
+        <property name="registerDomain" value="true"/>
+        <property name="domainRetentionPeriodInDays" value="1"/>
+        <property name="workflowImplementations">
+            <list>
+                <ref bean="workflowImpl"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="ComputerClientExternalFactory"
+          class="com.cirrustech.demo.service.workflow.swf.ComputerWorkflowClientExternalFactoryImpl">
+        <constructor-arg name="service" ref="swfClient"/>
+        <constructor-arg name="domain" value="${aws.swf.domain}"/>
+    </bean>
+
+    <bean id="watchDog" class="com.cirrustech.demo.service.workflow.WorkflowWatchDog" init-method="execute">
+        <constructor-arg name="factory" ref="ComputerClientExternalFactory"/>
+        <constructor-arg name="client" ref="swfClient"/>
+        <constructor-arg name="domain" value="${aws.swf.domain}"/>
+        <constructor-arg name="workflowId" value="${aws.swf.workflowId}"/>
+
+    </bean>
+
+
+</beans>
