@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="provider" class="com.amazonaws.auth.SystemPropertiesCredentialsProvider"/>
+
+    <bean id="credentials" class="com.amazonaws.auth.AWSCredentials" factory-bean="provider"
+          factory-method="getCredentials"/>
+
+    <bean id="statesClient" class="com.amazonaws.services.stepfunctions.AWSStepFunctionsClient">
+        <constructor-arg name="awsCredentials" ref="credentials"/>
+        <constructor-arg name="clientConfiguration">
+            <bean class="com.amazonaws.ClientConfiguration">
+                <property name="socketTimeout" value="70000"/>
+            </bean>
+        </constructor-arg>
+        <property name="endpoint" value="${aws.states.endpoint}"/>
+    </bean>
+
+    <bean id="computeActivity"
+          class="com.cirrustech.demo.service.workflow.stepfunction.activities.ComputeSquareActivity">
+        <constructor-arg name="activityArn" value="${states.activity.compute.arn}"/>
+        <constructor-arg name="client" ref="statesClient"/>
+    </bean>
+
+    <bean id="generateNumber"
+          class="com.cirrustech.demo.service.workflow.stepfunction.activities.GenerateNumberActivity">
+        <constructor-arg name="activityArn" value="${states.activity.generate.arn}"/>
+        <constructor-arg name="client" ref="statesClient"/>
+    </bean>
+
+    <bean id="sumActivity"
+          class="com.cirrustech.demo.service.workflow.stepfunction.activities.SumActivity">
+        <constructor-arg name="activityArn" value="${states.activity.sum.arn}"/>
+        <constructor-arg name="client" ref="statesClient"/>
+    </bean>
+
+    <bean id="sleepAndStartAgain"
+          class="com.cirrustech.demo.service.workflow.stepfunction.activities.SleepAndStartAgain">
+        <constructor-arg name="activityArn" value="${states.activity.wait.arn}"/>
+        <constructor-arg name="client" ref="statesClient"/>
+        <constructor-arg name="sleepTimeSeconds" value="${states.wait.time.seconds}"/>
+    </bean>
+
+    <bean id="watchDog" class="com.cirrustech.demo.service.workflow.WorkflowWatchDog"
+          init-method="execute" destroy-method="shutDown">
+        <constructor-arg name="stateArn" value="${states.stateName.arn}"/>
+        <constructor-arg name="client" ref="statesClient"/>
+        <constructor-arg name="runs">
+            <list>
+                <ref bean="computeActivity"/>
+                <ref bean="generateNumber"/>
+                <ref bean="sumActivity"/>
+                <ref bean="sleepAndStartAgain"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+</beans>

@@ -1,0 +1,69 @@
+{
+  "Comment": "The equivalent state machine for the demo workflow",
+  "StartAt": "StartWorkflow",
+  "States": {
+    "StartWorkflow": {
+      "Type": "Parallel",
+      "Next": "Sum",
+      "Branches": [
+        {
+          "StartAt": "GenerateNumber",
+          "States": {
+            "GenerateNumber": {
+              "Type": "Task",
+              "Resource": "<arn1>",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "ComputeSquare",
+          "States": {
+            "ComputeSquare": {
+              "Type": "Task",
+              "Resource": "<arn2>",
+              "End": true
+            }
+          }
+        }
+      ]
+    },
+    "Sum": {
+      "Type": "Task",
+      "Resource": "<arn3>",
+      "Next": "CheckContinueOrStop"
+    },
+    "CheckContinueOrStop": {
+      "Type" : "Choice",
+      "Choices": [
+        {
+          "Variable": "$.runAgain",
+          "BooleanEquals": true,
+          "Next": "SleepAndStartAgain"
+        },
+        {
+          "Variable": "$.runAgain",
+          "BooleanEquals": false,
+          "Next": "GoToFinal"
+        }
+      ]
+    },
+
+    "SleepAndStartAgain": {
+      "Type": "Task",
+      "Resource": "<arn4>",
+      "Next": "StartWorkflow"
+    },
+    "GoToFinal": {
+      "Type": "Pass",
+      "Next": "EndState"
+    },
+    "EndState": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}
+
+
+
