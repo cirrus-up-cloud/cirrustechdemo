@@ -1,0 +1,24 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="clientConfiguration" class="com.amazonaws.ClientConfiguration">
+        <property name="connectionTimeout" value="${aws.connection.timeout.millis}"/>
+        <property name="socketTimeout" value="${aws.socket.timeout.millis}"/>
+        <property name="maxConnections" value="${aws.max.client.connections}"/>
+    </bean>
+
+    <bean id="awsSqsClient" class="com.amazonaws.services.sqs.AmazonSQSAsyncClient">
+        <constructor-arg name="clientConfiguration" ref="clientConfiguration"/>
+        <property name="region">
+            <bean class="com.amazonaws.regions.RegionUtils" factory-method="getRegion">
+                <constructor-arg name="regionName" value="${aws.region}"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="queueMessagingTemplate" class="org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate">
+        <constructor-arg name="amazonSqs" ref="awsSqsClient"/>
+    </bean>
+</beans>

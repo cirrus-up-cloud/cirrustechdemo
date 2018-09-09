@@ -9,4 +9,7 @@
     <context:property-placeholder location="classpath:properties/config-${spring.profiles.active}.properties"/>
 
     <context:component-scan base-package="com.cirrustech.demo.*"/>
+
+    <import resource="queue-setup.xml"/>
+
 </beans>
