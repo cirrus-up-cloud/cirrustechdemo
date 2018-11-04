@@ -27,7 +27,6 @@
         </dependency>
 
         <!--Swagger-->
-
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
@@ -38,6 +37,12 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.coveo</groupId>
+            <artifactId>spillway</artifactId>
+            <version>2.0.0</version>
         </dependency>
 
     </dependencies>
