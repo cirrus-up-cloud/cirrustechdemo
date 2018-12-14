@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id="fileDataStore" class="com.cirrustech.demo.datastore.FileDataStoreWithAWSS3">
+        <constructor-arg name="bucketName" value="${file.data.store.bucket}"/>
+        <constructor-arg name="amazonS3">
+            <bean class="com.amazonaws.services.s3.AmazonS3Client">
+                <constructor-arg name="awsCredentials">
+                    <bean class="com.amazonaws.auth.BasicAWSCredentials">
+                        <constructor-arg name="accessKey" value="#{systemProperties['accessKey']}"/>
+                        <constructor-arg name="secretKey" value="#{systemProperties['secretKey']}"/>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
+    </bean>
+</beans>

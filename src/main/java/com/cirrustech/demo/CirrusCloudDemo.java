@@ -38,6 +38,7 @@ public class CirrusCloudDemo {
 
     public Predicate<String> getPaths() {
 
-        return or(regex("/hello*"));
+        return or(regex("/hello*"),
+                regex("/upload*"));
     }
 }
