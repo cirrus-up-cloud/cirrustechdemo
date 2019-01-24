@@ -24,8 +24,26 @@ public class CirrusCloudDemo {
 
         LOG.info("Starting application... ");
         LOG.info("Active Spring profile: " + System.getProperty("spring.profiles.active"));
+        setLocalstackEnvValue();
         SpringApplication.run(CirrusCloudDemo.class, args);
     }
+
+    private static void setLocalstackEnvValue() {
+
+        if (isRunningLocalProfile()) {
+
+            System.setProperty("spring.localstack.enabled", "true");
+        } else {
+
+            System.setProperty("spring.localstack.enabled", "false");
+        }
+    }
+
+    private static boolean isRunningLocalProfile() {
+
+        return System.getProperty("spring.profiles.active").equals("local");
+    }
+
 
     @Bean
     public Docket createDocketForSwaggerIntegration() {

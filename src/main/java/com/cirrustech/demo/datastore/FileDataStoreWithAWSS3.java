@@ -6,6 +6,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -15,17 +17,20 @@ import static com.amazonaws.services.s3.model.ObjectMetadata.AES_256_SERVER_SIDE
 /**
  * Implementation of {@link FileDataStore} using AWS S3.
  */
+@Component
 public class FileDataStoreWithAWSS3 implements FileDataStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileDataStoreWithAWSS3.class);
 
     private final AmazonS3 amazonS3;
+
     private final String bucketName;
 
     /**
      * Constructor.
      */
-    public FileDataStoreWithAWSS3(AmazonS3 amazonS3, String bucketName) {
+    public FileDataStoreWithAWSS3(AmazonS3 amazonS3,
+                                  @Value("${file.data.store.bucket}") String bucketName) {
 
         this.amazonS3 = amazonS3;
         this.bucketName = bucketName;
