@@ -1,0 +1,30 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="hostName" value="${redis.cluster.url}"/>
+        <property name="port" value="${redis.cluster.port}"/>
+    </bean>
+
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory"/>
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+    </bean>
+
+    <bean id="springTemplateDriver" class="com.github.davidmarquis.redisscheduler.drivers.spring.RedisTemplateDriver">
+        <constructor-arg name="redisTemplate" ref="redisTemplate"/>
+    </bean>
+
+    <bean id="scheduler" class="com.github.davidmarquis.redisscheduler.RedisTaskScheduler">
+        <constructor-arg name="driver" ref="springTemplateDriver"/>
+        <constructor-arg name="listener">
+            <bean class="com.cirrustech.demo.task.CirrusTaskTriggerListener"/>
+        </constructor-arg>
+    </bean>
+
+</beans>

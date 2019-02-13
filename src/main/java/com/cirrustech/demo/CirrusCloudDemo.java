@@ -39,6 +39,6 @@ public class CirrusCloudDemo {
     public Predicate<String> getPaths() {
 
         return or(regex("/hello*"),
-                regex("/report*"));
+                regex("/schedule*"));
     }
 }
